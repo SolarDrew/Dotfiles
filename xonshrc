@@ -1,0 +1,62 @@
+# added by Anaconda3 2.4.1 installer
+$PATH.insert(0, "/home/drew/anaconda3/bin/")
+
+# Global imports
+try:
+    import numpy as np
+    import astropy.units as u
+except:
+    pass
+
+############# CONDA ################
+$CONDAON = False
+def _condaon(args, stdin=None):
+    $CONDAON = True
+    $PATH.insert(0, "/home/drew/anaconda3/bin/")
+
+def _condaoff(args, stdin=None):
+    _deactivate(args)
+    $PATH.remove("/home/drew/anaconda3/bin/")
+    $CONDAON = False
+
+def _get_envs():
+    envs = ["/home/drew/anaconda3/envs"]
+    return [env for env in $(ls @(envs[0])).split('\n')[:-1]]
+
+def _activate(args, stdin=None):
+    if not $CONDAON:
+        _condaon(args, stdin=stdin)
+    try:
+        if $CONDA_DEFAULT_ENV:
+            _deactivate([$CONDA_DEFAULT_ENV])
+    except KeyError:
+         pass
+    env = args[0]
+    if env in _get_envs():
+        $PATH.insert(0, "/home/drew/anaconda3/envs/{}/bin/".format(env))
+        $CONDA_DEFAULT_ENV = env
+        $VIRTUAL_ENV = $CONDA_DEFAULT_ENV
+    else:
+        print("env: {} not found.".format(env))
+
+def _deactivate(args, stdin=None):
+    if args:
+        env = args[0]
+    else:
+        try:
+            if $CONDA_DEFAULT_ENV:
+                env = $CONDA_DEFAULT_ENV
+        except KeyError:
+             print("No env to deactivate")
+    try:
+        $PATH.remove("/home/drew/anaconda3/envs/{}/bin/".format(env))
+        del $CONDA_DEFAULT_ENV
+        del $VIRTUAL_ENV
+    except ValueError:
+        pass
+
+aliases['condaon'] = _condaon
+aliases['condaoff'] = _condaoff
+aliases['cac'] = _activate
+aliases['cde'] = _deactivate
+
